@@ -6,7 +6,7 @@ import {GoogleMap, InfoWindow, Marker, withGoogleMap, withScriptjs} from "react-
 const MapContainer = withScriptjs(withGoogleMap((props) => {
 
     const nearby = props.nearby
-    const filterBythis = props.filterBythis
+    const detailshop = props.detailshop
 
 
 
@@ -29,7 +29,7 @@ const MapContainer = withScriptjs(withGoogleMap((props) => {
 
                nearby.map((item,k) =>
                    <Marker key={k} position={{ lat: parseFloat(item.lat), lng: parseFloat(item.long) }}
-                    onClick={e => filterBythis(item.name)}
+                    onClick={e => detailshop(item.id)}
                    >
                        <InfoWindow >
                            <strong >{item.name}</strong>

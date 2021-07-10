@@ -3,12 +3,13 @@ import React from 'react';
 import './styles.css';
 import  loading from '../../assets/img/loader.gif';
 
-const LocalLoader = () => {
+const SendingLoading = () => {
     return (
-        <div  className="loading__local" >
+        <div  className="sending__call" >
             <img src={loading} alt=""    />
+            <p style={{color : "#fff"}}>Sending booking...</p>
         </div>
     );
 };
 
-export default LocalLoader;
+export default SendingLoading;

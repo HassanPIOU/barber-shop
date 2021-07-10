@@ -13,8 +13,13 @@ export const registerUserWithEmail = (formData, history) => async (dispatch, get
     await axios.post(SERVER_URL+'register', formData);
     dispatch({
       type: REGISTER_WITH_EMAIL_SUCCESS,
+        payload : {success : "success"}
     });
-    history.push('/login');
+
+    setTimeout(() => {
+        history.push('/login');
+    },3000)
+
   } catch (err) {
     dispatch({
       type: REGISTER_WITH_EMAIL_FAIL,

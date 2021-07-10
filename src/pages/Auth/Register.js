@@ -8,9 +8,10 @@ import { getShop } from '../../store/actions/shopActions';
 
 import {APP_NAME} from "../../base/app";
 import {CSSTransition} from "react-transition-group";
+import {useToasts} from "react-toast-notifications";
 const Register = ({
                       auth,
-                      register: { isLoading, error },
+                      register: { success, isLoading, error },
                       history,
                       registerUserWithEmail,
                       getShop,
@@ -19,6 +20,7 @@ const Register = ({
 
 
     const [hasshop,setHasshop] = useState(1)
+    const [agree,setAgree] = useState(false)
 
 
 
@@ -35,11 +37,13 @@ const Register = ({
 
     const comparetoPassword = (value) => {
       if (value != password){
-          setPassworderror("same")
+          setPassworderror("The two password are not same")
       }else{
           setPassworderror("")
       }
     }
+
+    const { addToast } = useToasts();
 
     useEffect(() => {
         document.title = APP_NAME+" - Register"
@@ -48,7 +52,11 @@ const Register = ({
 
     useEffect(() => {
         if (error) {
+            addToast(error,{appearance : "error"})
+        }
 
+        if (success) {
+            addToast("Account create successfully",{appearance : "success"})
         }
     }, [error]);
 
@@ -62,6 +70,14 @@ const Register = ({
         } else{
             setHasshop(1)
             setInProp(false)
+        }
+    }
+
+    const setAgreement = (v) => {
+        if (v.checked){
+            setAgree(true)
+        }else{
+            setAgree(false)
         }
     }
 
@@ -92,23 +108,13 @@ const Register = ({
 
   return (
       <div className="d-lg-flex half">
-          <div className="contents order-2 order-md-1" style={{width : "50%"}}>
+          <div className="contents order-2 order-md-1 registery" >
               <div className="container">
                   <div className="row align-items-center justify-content-center bg-dark text-white">
                       <div className="col-md-9">
                           <h1 className="text-white"><strong>Register</strong></h1>
                           <br/>
                                  <form   onSubmit={onSubmit}>
-
-                                     <div className="d-flex mb-5 align-items-center">
-                                         <label className="control  mb-0"><span className="caption">i'm a shop</span>
-                                             <input type="checkbox"
-                                                    value={hasshop}
-                                                    onChange={ e => HandleToggleShop(e.target.value)}
-                                             />
-                                             <div className="control__indicator"></div>
-                                         </label>
-                                     </div>
 
                                   <div className="form-row">
                                       <div className="col">
@@ -163,51 +169,6 @@ const Register = ({
                                          </div>
                                      </div>
 
-
-                                     {hasshop == 2 &&
-                                     <CSSTransition  timeout={200} classNames="fade">
-                                     <>
-                                         {shop.length > 0 &&
-                                         <>
-                                             <small>If you are a shop owner , you can register your shop name by enter
-                                                 the name in this input</small>
-                                             <br/>
-                                             <br/>
-                                         </>
-                                         }
-
-
-                                         <div className="row">
-                                             {shop.length > 0 &&
-                                             <>
-                                                 <div className="form-group col-lg-6">
-                                                     <label htmlFor="">Your Shop</label>
-                                                     <select name="shop_choose" id="" className="form-control"
-                                                             onChange={e => setShop_choose(e.target.value)} style={{height : "45px"}}>
-                                                         <option disabled selected >--Choose--</option>
-                                                         {shop.map((item,k) => <option value={item.id}>A</option>)}
-                                                     </select>
-                                                 </div>
-                                             </>
-                                             }
-
-                                             <div className={`form-group ${shop.length > 0 ? "col-lg-6" : "col-lg-12"}`}>
-                                                 <label htmlFor="">Shop name</label>
-                                                 <input type="text"
-                                                        className="form-control"
-                                                        placeholder="My shop name"
-                                                        name="shop_name"
-                                                        onChange={e => setShop_name(e.target.value)}
-                                                 />
-                                             </div>
-                                         </div>
-
-                                         <br/>
-
-                                     </>
-                                     </CSSTransition>
-                                     }
-
                                      <div className="row">
                                          <div className="form-group col-lg-6" >
                                              <label className="mb-1">Password</label>
@@ -239,19 +200,87 @@ const Register = ({
                                                      required
                                                  />
                                              </div>
+                                             <small className="text-danger">{passworderror}</small>
                                          </div>
                                      </div>
 
-                                  <div className="text-danger">{passworderror}</div>
 
-                                  <small className="form-group">
-                                      <label className="mb-1">You agree to {APP_NAME} <a href="#" className="text-gold">User Agreement</a>, <a
-                                          href="#" className="text-gold">Privacy Policy</a>, and <a href="#" className="text-gold">Cookie Policy</a>.</label>
-                                  </small>
+
+                                     <br/>
+                                     <div className="d-flex mb-5 align-items-center">
+                                         <label className="control  mb-0"><span className="caption">I'm a shop or barber</span>
+                                             <input type="checkbox"
+                                                    value={hasshop}
+                                                    onChange={ e => HandleToggleShop(e.target.value)}
+                                             />
+                                             <div className="control__indicator"></div>
+                                         </label>
+                                     </div>
+                                     {hasshop == 2 &&
+                                     <CSSTransition  timeout={200} classNames="fade">
+                                         <>
+                                             {shop &&
+                                             <>
+                                                 <small>If you are a shop owner , you can register your shop name by enter
+                                                     the name in this input</small>
+                                                 <br/>
+                                                 <br/>
+                                             </>
+                                             }
+
+
+                                             <div className="row">
+                                                 {shop  &&
+                                                 <>
+                                                     <div className="form-group col-lg-6">
+                                                         <label htmlFor="">Your Shop</label>
+                                                         <select name="shop_choose" id="" className="form-control"
+                                                                 style={{background : "#fff"}}
+                                                                 onChange={e => setShop_choose(e.target.value)} style={{height : "45px"}}>
+                                                             <option disabled selected >--Choose--</option>
+                                                             {shop.map((item,k) => <option key={k} value={item.id}>{item.name}</option>)}
+                                                         </select>
+                                                     </div>
+                                                 </>
+
+                                                 }
+
+                                                 <div className={`form-group ${shop && shop.length > 0 ? "col-lg-6" : "col-lg-12"}`}>
+                                                     <label htmlFor="">Shop name</label>
+                                                     <input type="text"
+                                                            className="form-control"
+                                                            placeholder="My shop name"
+                                                            name="shop_name"
+                                                            style={{background : "#fff"}}
+                                                            onChange={e => setShop_name(e.target.value)}
+                                                     />
+                                                 </div>
+                                             </div>
+
+                                             <br/>
+
+                                         </>
+                                     </CSSTransition>
+                                     }
+
+
+                                     <label className="control  mb-0">
+                                         <span className="caption">
+                                            <small className="text-white">
+                                                 You agree to {APP_NAME} <a href="#" className="text-gold">User Agreement</a>, <a
+                                                href="#" className="text-gold">Privacy Policy</a>, and <a href="#" className="text-gold">Cookie Policy</a>.
+                                            </small>
+                                         </span>
+                                         <input type="checkbox"
+                                                value={agree}
+                                                onChange={ e => setAgreement(e.target)}
+                                         />
+                                         <div className="control__indicator"></div>
+                                     </label>
 
                                      <br/>
                                      <br/>
-                                  <button className="btn  gold  text-uppercase" type="submit" disabled={isLoading}>
+                                  <button className="btn  gold  text-uppercase" type="submit" disabled={!agree || isLoading}>
                                       {isLoading ?
                                           <><span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...</>
                                           : <span> Register</span>

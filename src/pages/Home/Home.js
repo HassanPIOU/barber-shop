@@ -7,7 +7,7 @@ import {APP_NAME} from "../../base/app";
 
 const Home = ({ auth}) => {
     useEffect(() => {
-        document.title = APP_NAME+" -  home"
+        document.title = APP_NAME+" -  Find your favorite barber"
     });
 
 

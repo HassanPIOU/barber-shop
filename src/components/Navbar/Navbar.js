@@ -1,10 +1,10 @@
 import React from 'react'
-import {Link, withRouter} from "react-router-dom";
-import {APP_NAME} from "../../base/app";
+import {Link, Redirect, withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
 import {compose} from "redux";
 
 const Navbar = ({auth}) => {
+
     return(
               <header className="herboil__header-area bg-dark">
                   <div className="herboil__header-top-area">
@@ -42,11 +42,24 @@ const Navbar = ({auth}) => {
                                           <div className="herboil__navbar">
                                               <nav>
                                                   <ul>
-                                                      <li><Link to="/" className="text-white">Home</Link>
-                                                      </li>
-                                                      <li><Link to="booking" className="text-white">Booking</Link></li>
+                                                      {
+                                                          !auth.isAuthenticated &&  <li><Link to="/" className="text-white">Home</Link></li>
+                                                      }
+
+                                                      {
+                                                          parseInt(auth.me.role_id) == 1 && <li><Link to="booking" className="text-white">Booking</Link></li>
+                                                      }
+
+                                                      <li><Link to="historic" className="text-white">Historic</Link></li>
+
                                                       <li><Link to="invoice" className="text-white">Invoice</Link></li>
-                                                      <li><Link to="setting" className="text-white">Settings</Link></li>
+
+                                                      {
+                                                          parseInt(auth.me.role_id) == 2 || parseInt(auth.me.role_id) == 3 &&
+                                                          <li><Link to="settings" className="text-white">Settings</Link></li>
+                                                      }
+
+
 
                                                   </ul>
                                               </nav>

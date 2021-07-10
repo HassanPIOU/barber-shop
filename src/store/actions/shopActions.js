@@ -9,10 +9,23 @@ import {
     GET_NEARBY_FAIL,
     GET_BARBER_LOADING,
     GET_BARBER_FAIL,
-    GET_BARBER_SUCCESS, GET_SERVICES_FAIL, GET_SERVICES_SUCCESS, GET_SERVICES_LOADING,
+    GET_BARBER_SUCCESS,
+    GET_SERVICES_FAIL,
+    GET_SERVICES_SUCCESS,
+    GET_SERVICES_LOADING,
+    GET_TIMES_LOADING,
+    GET_TIMES_SUCCESS,
+    GET_TIMES_FAIL,
+    SEND_PAYMENT_LOADING,
+    SEND_PAYMENT_FAIL,
+    SEND_PAYMENT_SUCCESS,
+    ADD_BOOKING_FAIL,
+    ADD_BOOKING_SUCCESS,
+    ADD_BOOKING_LOADING,
 
 } from '../types';
 import {SERVER_URL} from "../../base/app";
+
 import { attachTokenToHeaders } from './authActions';
 
 export const getShop = () => async (dispatch) => {
@@ -127,6 +140,102 @@ export const serviceList = (id) => async (dispatch,getState) => {
     } catch (err) {
         dispatch({
             type: GET_SERVICES_FAIL,
+            payload: { error: err?.response?.data.message || err.message },
+        });
+    }
+};
+
+export const getTimeList = (data) => async (dispatch,getState) => {
+    dispatch({
+        type: GET_TIMES_LOADING,
+    });
+    try {
+
+
+        const options = attachTokenToHeaders(getState);
+        const response = await axios.post(SERVER_URL+'booking/barber/availability',data,options);
+
+
+        if (response.data.status == "error"){
+            dispatch({
+                type: GET_TIMES_FAIL,
+                payload: { error: response.data.error  },
+            });
+
+        } else{
+            dispatch({
+                type: GET_TIMES_SUCCESS,
+                payload: { times: response.data.data },
+            });
+        }
+
+
+    } catch (err) {
+        dispatch({
+            type: GET_TIMES_FAIL,
+            payload: { error: err?.response?.data.message || err.message },
+        });
+    }
+};
+
+export const savePayment = (data) => async (dispatch,getState) => {
+    dispatch({
+        type: SEND_PAYMENT_LOADING,
+    });
+    try {
+
+
+        const options = attachTokenToHeaders(getState);
+        const response = await axios.post(SERVER_URL+'payment',data,options);
+
+        if (response.data.status == "error"){
+            dispatch({
+                type: SEND_PAYMENT_FAIL,
+                payload: { error: response.data.error  },
+            });
+
+        } else{
+            dispatch({
+                type: SEND_PAYMENT_SUCCESS,
+                payload: { key_token: response.data.data },
+            });
+        }
+
+
+    } catch (err) {
+        dispatch({
+            type: SEND_PAYMENT_FAIL,
+            payload: { error: err?.response?.data.message || err.message },
+        });
+    }
+};
+export const addBooking = (data) => async (dispatch,getState) => {
+    dispatch({
+        type: ADD_BOOKING_LOADING,
+    });
+    try {
+
+
+        const options = attachTokenToHeaders(getState);
+        const response = await axios.post(SERVER_URL+'booking',data,options);
+
+        if (response.data.status == "error"){
+            dispatch({
+                type: ADD_BOOKING_FAIL,
+                payload: { error: response.data.error  },
+            });
+
+        } else{
+            dispatch({
+                type: ADD_BOOKING_SUCCESS,
+                payload: { status : response.data.data },
+            });
+        }
+
+
+    } catch (err) {
+        dispatch({
+            type: ADD_BOOKING_FAIL,
             payload: { error: err?.response?.data.message || err.message },
         });
     }

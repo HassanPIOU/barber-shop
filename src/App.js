@@ -13,6 +13,9 @@ import Register from "./pages/Auth/Register";
 import NotFound from "./pages/NotFound/NotFound";
 import Reservation from "./pages/Reservation/Reservation";
 import {APP_NAME} from "./base/app";
+import List from "./pages/List/List";
+import Invoice from "./pages/Invoice/Invoice";
+import Setting from "./pages/Setting/Setting";
 
 function App({loadMe,logInUserWithOauth,auth}) {
     useEffect(() => {
@@ -49,6 +52,9 @@ function App({loadMe,logInUserWithOauth,auth}) {
                         <Route path="/notfound" component={NotFound} />
 
                         <PrivateRoute path={`/booking`}  component={Reservation}  isAuthenticated={auth.isAuthenticated} />
+                        <PrivateRoute path={`/historic`}  component={List}  isAuthenticated={auth.isAuthenticated} />
+                        <PrivateRoute path={`/invoice`}  component={Invoice}  isAuthenticated={auth.isAuthenticated} />
+                        <PrivateRoute path={`/settings`}  component={Setting}  isAuthenticated={auth.isAuthenticated} />
                         <Route component={NotFound} />
                     </Switch>
 

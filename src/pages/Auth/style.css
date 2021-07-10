@@ -1,7 +1,3 @@
-body {
-  font-family: "Roboto", sans-serif;
-  background-color: #fff; }
-
 p {
   color: #b3b3b3;
   font-weight: 300; }
@@ -23,13 +19,27 @@ a {
 h2 {
   font-size: 20px; }
 
+.registery{
+  width: 50% !important;
+}
+
 .half, .half .container > .row {
   height: 100vh;
   min-height: 700px; }
 
 @media (max-width: 991.98px) {
+  .half, .half .container > .row {
+    height: 100% !important;
+    min-height: 900px;
+  }
   .half .bg {
-    height: 200px; } }
+    display: none;
+  }
+
+  .registery  {
+    width: 100%;
+  }
+}
 
 .half .contents {
   width: 30%;
@@ -123,11 +133,11 @@ h2 {
   background: #ccc; }
 
 .control input:checked ~ .control__indicator {
-  background: #0A83D6; }
+  background: #D8B438; }
 
 .control:hover input:not([disabled]):checked ~ .control__indicator,
 .control input:checked:focus ~ .control__indicator {
-  background: #0a7bcb; }
+  background: #D8B438; }
 
 .control input:disabled ~ .control__indicator {
   background: #e6e6e6;

@@ -3,20 +3,26 @@ import {compose} from "redux";
 import { Link, withRouter } from 'react-router-dom';
 import {connect, useDispatch} from 'react-redux';
 import Layout from "../../layout/Layout";
-import {CSSTransition} from "react-transition-group";
-import Barber from "../../components/Card/Barber";
 import Shop from "../../components/Card/Shop";
 import MapContainer from "../../components/MapContainer";
-import {RadioButton, RadioGroup} from "react-radio-buttons";
 
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import Service from "../../components/Card/Service";
 import LocalLoader from "../../components/PageLoader/LocalLoader";
-import {nearbyShop,barberList, serviceList} from "../../store/actions/shopActions";
+import {
+    nearbyShop,
+    barberList,
+    serviceList,
+    getTimeList,
+    savePayment,
+    addBooking
+} from "../../store/actions/shopActions";
 import {useToasts} from "react-toast-notifications";
+import SBarber from "../../sections/SBarbers";
+import SServices from "../../sections/SServices";
+import SCalendar from "../../sections/SCalendar";
+import STimes from "../../sections/STimes";
+import SPayment from "../../sections/SPayment";
+import SFinish from "../../sections/SFinish";
+import PageLoader from "../../components/PageLoader/PageLoader";
 import AcceptGeo from "../../components/AcceptGeo";
 
 
@@ -27,7 +33,14 @@ const Reservation = ({
                           barberList,
                           barbers : {barbers},
                          serviceList,
-                          services : {services}
+                          services : {services},
+                         getTimeList,
+                           times : {times},
+                           savePayment,
+                         payment : {key_token},
+                          booking : {status},
+                          addBooking,
+                         cart : {Carts}
                         }) => {
     const { addToast } = useToasts();
     const [state,setState] = useState({
@@ -56,7 +69,7 @@ const Reservation = ({
         if (navigator.geolocation){
             navigator.geolocation.getCurrentPosition(getLocation)
         }else{
-            alert('enabled geolocalisation')
+            return(<PageLoader />)
         }
 
         if (error){
@@ -89,9 +102,15 @@ const Reservation = ({
         })
     }
 
+
+    const [barber__, setBarber__] = useState("")
+    const [date__, setDate__] = useState("")
+    const [time__, setTime__] = useState("")
+
   const  detailBarber = (id) => {
         serviceList(id)
-        setState({
+      setBarber__(id)
+      setState({
             ...state,
             detail : 3
         })
@@ -99,6 +118,7 @@ const Reservation = ({
     }
 
   const  available = () => {
+
         setState({
             ...state,
             detail : 4
@@ -106,9 +126,12 @@ const Reservation = ({
 
     }
 
-
-
-   const getDate = () => {
+   const getserviceDate = (date) => {
+        setDate__(date)
+        getTimeList({
+            date : date,
+            barber : barber__
+        })
         setState({
             ...state,
             detail : 5
@@ -116,73 +139,37 @@ const Reservation = ({
 
     }
 
-  const  getSelectTime = () => {
+  const  getSelectTime = (time) => {
+      setTime__(time)
         setState({
             ...state,
             detail : 6
         })
     }
 
-  const   changeColor = () => {
-        if (state.choosebooking == ""){
-            setState({
-                ...state,
-                choosebooking : " gold"
-            })
-        } else{
-            setState({
-                ...state,
-                choosebooking : ""
-            })
-        }
+
+  const  cardPayment = (data) => {
+
+        savePayment(data)
+
     }
 
-  const  cardPayment = () => {
-        setState({
-            ...state,
-            detail : 7
-        })
-
-        if (state.cardpaycolor == ""){
-            setState({
-                ...state,
-                cardpaycolor : " gold"
-            })
-        } else{
-            setState({
-                ...state,
-                cardpaycolor : ""
-            })
-        }
-    }
-
-  const  cashpayment = () => {
-        setState({
-            ...state,
-            detail : 8
-        })
-
-        if (state.cashpaycolor == ""){
-            setState({
-                ...state,
-                cashpaycolor : " gold"
-            })
-        } else{
-            setState({
-                ...state,
-                cashpaycolor : ""
-            })
-        }
-    }
-
-   const finishProcesss = () => {
-        setState({
-            ...state,
-            detail : 8
-        })
-    }
-
-
+ useEffect(() => {
+         if (key_token !== null){
+             setState({
+                 ...state,
+                 detail : 7
+             })
+             const book_data = {
+                 services : Carts,
+                 barber : barber__,
+                 date : date__,
+                 time : time__,
+                 token : key_token
+             }
+             addBooking(book_data)
+         }
+ },[key_token,addBooking])
 
 
 // Search in List
@@ -211,6 +198,7 @@ const Reservation = ({
             setSearchResults(results);
         }
     }, [search]);
+    // if (auth.isAuthenticated) if (auth.me.role_id != 1) return <Redirect to={`/dashboard`} />;
 
 
     return (
@@ -220,8 +208,9 @@ const Reservation = ({
                <>
                    {state.latitude != null ?
                    <Layout>
-                       {state.detail < 2 &&
-                       <div className="container-fluid">
+                       {state.detail === 1 &&
+                            <>
+                                <div className="container-fluid">
                            <div className="row">
                                <div className="col col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                                    <div className="ui-block">
@@ -232,274 +221,57 @@ const Reservation = ({
                                                local={{lat: state.latitude, long: state.longitude}}
                                                nearby={nearby ? nearby : []}
                                                filterBythis={filterBythis}
+                                               detailshop={detailshop}
                                                googleMapURL={state.maptoken}
                                                loadingElement={<div style={{height: `100%`}}/>}
                                                containerElement={<div style={{height: `450px`}}/>}
                                                mapElement={<div style={{height: `100%`, width: "100%"}}/>}
                                            />
-                                           <div className="row">
-                                               <div className="offset-lg-3 col-lg-6 mt-3">
-                                                   <input type="text" className="form-control bg-white"
-                                                          placeholder="Search your Barber Shop"
-                                                          onChange={e => handleChange(e)}/>
-                                               </div>
-                                           </div>
+
                                        </div>
                                    </div>
                                </div>
                            </div>
                        </div>
+                                <div className="container">
+                                <div className="row">
+                                    <div className="offset-lg-3 col-lg-6 mt-3">
+                                        <input type="text" className="form-control bg-white"
+                                               placeholder="Search your Barber Shop"
+                                               onChange={e => handleChange(e)}/>
+                                    </div>
+
+                                    <div className="col-lg-12">
+                                        <h3 className="mt-3 text-white">Find your Stylist</h3>
+                                    </div>
+                                    <div className="row">
+                                        {searchResults.map((item, k) =>
+                                            <div className="col-lg-6" key={k}>
+                                                <Shop detailshop={detailshop} item={item}/>
+                                            </div>)
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                           </>
                        }
 
                        <div className="container">
-                           {state.detail == 1 &&
-                           <div>
-                               {searchResults &&
-                               <>
-                                   <h3 className="mt-3 text-white">Find your Stylist</h3>
-                                   <div className="row">
-                                       {searchResults.map((item, k) =>
-                                           <div className="col-lg-6" key={k}>
-                                               <Shop detailshop={detailshop} item={item}/>
-                                           </div>)
-                                       }
-                                   </div>
-                               </>
-                               }
-                           </div>}
+                           {state.detail == 2 && <SBarber isLoading={isLoading} barbers={barbers} detailBarber={detailBarber} /> }
 
-                           {state.detail == 2 && <CSSTransition
-                               timeout={2000}
-                               classNames='fade'
-                           >
-                               <div className="mt-3">
-                                   <br/>
-                                   <br/>
-                                   <h3 className="mt-3 text-white">Barbers</h3>
-                                   <br/>
-                               <div className="row h-100"  >
-                                   <div className="col-lg-4">
-                                       {
-                                           isLoading ? <LocalLoader/>
-                                               :
-                                               <>
-                                                   {barbers &&
+                           {state.detail == 3 && <SServices  isLoading={isLoading}  services={services}  available={available} /> }
 
-                                                   <>
-                                                       {
-                                                           barbers.map((item, k) =>
-                                                               <Barber key={k} item={item} detailBarber={detailBarber}/>
-                                                           )
-                                                       }
-                                                   </>
-                                                   }
+                           { state.detail == 4 && <SCalendar isLoading={isLoading}  getserviceDate={getserviceDate} />}
 
-                                               </>
-                                       }
-                                   </div>
-                               </div>
-                               </div>
-                           </CSSTransition>}
+                           {state.detail == 5 && <STimes isLoading={isLoading}  times={times}  getSelectTime={getSelectTime} />}
 
-                           {
-                               state.detail == 3 &&
-                               <div style={{height : "100vh"}}>
-                                   <br/>
-                                   <br/>
-                                   <h3 className="mt-3 text-white">Services</h3>
-                                   <div className="row">
-                                       <br/>
-                                       <br/>
-                                       {services &&
+                           {state.detail == 6 && <SPayment isLoading={isLoading}  cardPayment={cardPayment} />}
 
-                                         <>
-                                         {
-                                             services.map((item,k) =>
-
-                                             <div className="col-lg-6">
-                                             <Service key={k} item={item} />
-                                             </div>
-                                             )
-                                         }
-                                         </>
-                                       }
-                                   </div>
-                                   <div className="col-lg-12 text-center" style={{position :   "absolute", bottom : "100px", right : "100px"}}>
-                                       <button className="add-to-cart-btn" onClick={available}>Check availability
-                                       </button>
-                                   </div>
-                               </div>
-                           }
-
-                           {
-                               state.detail == 4 &&
-                               <CSSTransition
-                                   timeout={300}
-                                   classNames="alert"
-                               >
-                                   <div className="col-lg-12">
-                                       <FullCalendar
-                                           defaultView="dayGridMonth"
-                                           header={{
-                                               left: "prev,next today",
-                                               center: "title",
-                                               right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
-                                           }}
-                                           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                                           weekends={true}
-                                           dateClick={getDate}
-                                       />
-
-                                   </div>
-                               </CSSTransition>
-                           }
-
-                           {
-                               state.detail == 5 &&
-                               <div>
-                                   <RadioGroup className="row mt-5" onChange={getSelectTime} horizontal>
-                                       <RadioButton value="9" className="col-lg-6" name="fruit">
-                                           9:00
-                                       </RadioButton>
-                                       <RadioButton value="10" className="col-lg-6" name="fruit">
-                                           10:00
-                                       </RadioButton>
-                                   </RadioGroup>
-                                   <RadioGroup className="row mt-5" onChange={getSelectTime} horizontal>
-                                       <RadioButton value="11" className="col-lg-6" name="fruit">
-                                           11:00
-                                       </RadioButton>
-                                       <RadioButton value="12" className="col-lg-6" name="fruit">
-                                           12:00
-                                       </RadioButton>
-                                   </RadioGroup>
-                                   <RadioGroup className="row mt-5" onChange={getSelectTime} horizontal>
-                                       <RadioButton value="13" className="col-lg-6" name="fruit">
-                                           13:00
-                                       </RadioButton>
-                                       <RadioButton value="14" className="col-lg-6" name="fruit">
-                                           14:00
-                                       </RadioButton>
-                                   </RadioGroup>
-                               </div>
-                           }
-
-                           {state.detail == 6 && <div className="row box-content">
-                               <div className="col-lg-12">
-                                   <h3>Payment Method</h3>
-                               </div>
-                               <div className="col-lg-12">
-                                   <hr/>
-                                   <h4>Confirm Booking</h4>
-                                   <br/>
-                                   <div style={{marginBottom: "10px"}}>
-                                       <div
-                                           className={`step__list confirm__booking __pay__element` + state.choosebooking}
-                                           onClick={changeColor}>
-                                           <div className="row">
-                                               <div className="col-lg-9">
-                                                   <h6>Adult Haircut</h6>
-                                                   <p>25th May 2021 super <br/>
-                                                       <small>09:00</small>
-                                                   </p>
-
-                                               </div>
-                                               <div className="col-lg-3 step__list__service">
-                                                   <div className="step__list__price">
-                                                       £25.0
-                                                   </div>
-                                               </div>
-                                           </div>
-                                       </div>
-                                   </div>
-                                   <br/>
-                                   <br/>
-
-                                   <h4>Select Payment Option</h4>
-                                   <div className="row box-content">
-                                       <div className="col-lg-6">
-                                           <div className={`confirm__booking __pay__element`} onClick={cashpayment}>
-                                               <div className="row">
-                                                   <div className="col-lg-7">
-                                                       Cash payment
-                                                   </div>
-                                                   <div className="col-lg-3">
-                                                       <h4>£25.00</h4>
-                                                   </div>
-                                               </div>
-                                           </div>
-                                       </div>
-                                       <div className="col-lg-6">
-                                           <div className={`confirm__booking __pay__element`} onClick={cardPayment}>
-                                               <div className="row">
-                                                   <div className="col-lg-7">
-                                                       Card payment
-                                                   </div>
-                                                   <div className="col-lg-3">
-                                                       <h4>£25.00</h4>
-                                                   </div>
-                                               </div>
-                                           </div>
-                                       </div>
-                                   </div>
-                               </div>
-                           </div>}
-
-                           {state.detail == 7 && <div>
-                               <div className="col-lg-12">
-                                   <h3>Card Details</h3>
-                               </div>
-                               <div className="col-lg-12">
-                                   <hr/>
-                                   <form action="">
-                                       <div className="row">
-                                           <div className="col-lg-12">
-                                               <input type="text" className="custom__input" placeholder="Name on Card"/>
-                                           </div>
-                                           <div className="col-lg-12">
-                                               <input type="text" className="custom__input" placeholder="Card Number"/>
-                                           </div>
-                                           <div className="col-lg-6">
-                                               <input type="month" className="custom__input" placeholder=""/>
-                                           </div>
-                                           <div className="col-lg-6">
-                                               <input type="number" className="custom__input" placeholder="123"/>
-                                           </div>
-
-                                           <div className="col-lg-12">
-                                               <br/>
-                                               <label className="f-radio">Select to save card
-                                                   <input type="checkbox" name="squareradio"/>
-                                                   <span className="square"></span>
-                                               </label>
-                                           </div>
-
-                                       </div>
-
-                                       <div className="offset-lg-4 col-lg-4">
-                                           <button className="fabl fabl-block gold" onClick={finishProcesss}>Proceed
-                                           </button>
-                                       </div>
-                                   </form>
-                               </div>
-                           </div>}
-
-                           {state.detail == 8 && <div className="form-group text-center">
-                               <h5>Thank you for completing your booking</h5>
-                               <br/>
-                               <br/>
-                               <p className="success__icon"><i className="fa fa-check"></i></p>
-                               <br/>
-                               <h5 className="text-center">
-                                   Your Completion has been successful <br/>
-                                   A confirmation email <br/>
-                                   Be <br/>
-                                   Sent shortly
-                               </h5>
-                           </div>}
+                           {state.detail == 7 && <SFinish status={status} />}
                        </div>
                    </Layout>
-                       : <LocalLoader />
+                    : <AcceptGeo />
                    }
                </>
            }
@@ -512,6 +284,10 @@ const mapStateToProps = (state) => ({
     nearby : state.nearby,
     barbers : state.barber,
     services : state.services,
+    times : state.time,
+    payment : state.payment,
+    booking : state.booking,
+    cart : state.cart,
 });
 
-export default compose(withRouter, connect(mapStateToProps, {nearbyShop,barberList,serviceList} ))(Reservation);
+export default compose(withRouter, connect(mapStateToProps, {nearbyShop,barberList,serviceList,getTimeList,savePayment,addBooking} ))(Reservation);
