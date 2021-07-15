@@ -10,6 +10,9 @@ import cartReducer from "./cartReducer";
 import timeReducer from "./timeReducer";
 import paymentReducer from "./paymentReducer";
 import bookingReducer from "./bookingReducer";
+import userReducer from "./userReducer";
+import reviewsReducer from "./reviewsReducer";
+import logoutReducer from "./logoutReducer";
 
 
 export default combineReducers({
@@ -23,4 +26,7 @@ export default combineReducers({
     time : timeReducer,
     payment : paymentReducer,
     booking : bookingReducer,
+    user : userReducer,
+    reviews : reviewsReducer,
+    logout : logoutReducer,
 });

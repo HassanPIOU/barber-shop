@@ -1,6 +1,6 @@
 import React,{useEffect,useState} from 'react';
 import {compose} from "redux";
-import { Link, withRouter } from 'react-router-dom';
+import {Link, Redirect, withRouter} from 'react-router-dom';
 import {connect, useDispatch} from 'react-redux';
 import Layout from "../../layout/Layout";
 import Shop from "../../components/Card/Shop";
@@ -198,7 +198,7 @@ const Reservation = ({
             setSearchResults(results);
         }
     }, [search]);
-    // if (auth.isAuthenticated) if (auth.me.role_id != 1) return <Redirect to={`/dashboard`} />;
+     if (auth.isAuthenticated) if (auth.me.role_id != 1) return <Redirect to={`/booking-list`} />;
 
 
     return (

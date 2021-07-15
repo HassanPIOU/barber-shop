@@ -13,19 +13,19 @@ import Layout from "../../layout/Layout";
 
 const Invoice = ({ auth}) => {
     useEffect(() => {
-        document.title = APP_NAME+" -  Invoice"
+        document.title = APP_NAME+" -  Booking List"
     });
 
     return (
             <>
                 <Layout>
+                    <div className="secondHeader">
+                        <h1>Booking List</h1>
+                    </div>
                  <div className="container">
                      <div className="container" style={{height : "100vh"}}>
                          <div className="box-content">
-                             <h3 className="mt-3 text-white">My invoices</h3>
-
                              <form >
-
                                  <div className="step__head__inv"></div>
                                  <h3></h3>
                                  <div className="form-group" style={{padding : "20px"}}>
@@ -42,7 +42,7 @@ const Invoice = ({ auth}) => {
                                          className="boxed-btn add-to-cart-btn gold"
                                          type="button"
                                      >
-                                         <span>Proceed</span>
+                                         <span>Filter</span>
                                      </button>
                                  </p>
                              </form>

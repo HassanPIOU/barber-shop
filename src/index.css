@@ -285,3 +285,46 @@ input {
 .round_box{
   padding: 20px;
 }
+
+.secondHeader{
+  height: 250px;
+  background: #000;
+  text-align: center;
+}
+.secondHeader h1{
+  padding: 100px;
+  color: #D8B438;
+   text-transform: uppercase;
+}
+
+.tabs-setting{
+  padding: 20px;
+  background: #fff;
+}
+
+.about__ava__box{
+  width: 150px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+}
+
+.about__ava__box img{
+  margin-bottom: 10px;
+  border-radius: 50%;
+}
+
+.about__ava__box p strong{
+  padding-left: 20px;
+}
+
+.rating_five{
+  text-align: center;
+  color: #D8B438;
+}
+
+.logoutbtn{
+  background: none;
+  border: none;
+}

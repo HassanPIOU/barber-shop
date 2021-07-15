@@ -186,7 +186,7 @@ const Register = ({
                                              </div>
                                          </div>
                                          <div className="form-group col-lg-6">
-                                             <label className="mb-1">Confirmation</label>
+                                             <label className="mb-1">Re-Enter Password</label>
                                              <div className="position-relative icon-form-control">
                                                  <i className="mdi mdi-key-variant position-absolute"></i>
                                                  <input

@@ -1,9 +1,22 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import {Link, Redirect, withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
 import {compose} from "redux";
+import {logOutUser} from "../../store/actions/authActions";
+import { useHistory } from "react-router-dom";
+import {useToasts} from "react-toast-notifications";
 
-const Navbar = ({auth}) => {
+const Navbar = ({auth,logOutUser,logout : {message},history}) => {
+
+    const { addToast } = useToasts();
+
+    useEffect(() => {
+        if (message) {
+            addToast(message,{appearance : "success"})
+        }
+    }, [message]);
+
+
 
     return(
               <header className="herboil__header-area bg-dark">
@@ -22,7 +35,7 @@ const Navbar = ({auth}) => {
                                           <div className="header-top-menu">
                                               <ul className="text-white">
                                                          <small>Welcome {auth.me.first_name} !</small>
-                                                         <Link to=""><small className="text-danger ml-5">Logout</small></Link>
+                                                         <button  onClick={e => logOutUser(history)} className="logoutbtn"><small className="text-danger ml-5">Logout</small></button>
 
                                               </ul>
                                           </div>
@@ -50,9 +63,11 @@ const Navbar = ({auth}) => {
                                                           parseInt(auth.me.role_id) == 1 && <li><Link to="booking" className="text-white">Booking</Link></li>
                                                       }
 
-                                                      <li><Link to="historic" className="text-white">Historic</Link></li>
 
-                                                      <li><Link to="invoice" className="text-white">Invoice</Link></li>
+
+                                                   <li><Link to="booking-list" className="text-white">Booking List</Link></li>
+
+                                                      <li><Link to="payment-historic" className="text-white">Payment</Link></li>
 
                                                       {
                                                           parseInt(auth.me.role_id) == 2 || parseInt(auth.me.role_id) == 3 &&
@@ -78,6 +93,7 @@ const Navbar = ({auth}) => {
 const mapStateToProps = (state) => ({
     auth: state.auth,
     errors: state.errors,
+    logout: state.logout,
 });
 
-export default compose(withRouter, connect(mapStateToProps, {  }))(Navbar);
+export default compose(withRouter, connect(mapStateToProps, { logOutUser }))(Navbar);

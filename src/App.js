@@ -13,7 +13,7 @@ import Register from "./pages/Auth/Register";
 import NotFound from "./pages/NotFound/NotFound";
 import Reservation from "./pages/Reservation/Reservation";
 import {APP_NAME} from "./base/app";
-import List from "./pages/List/List";
+import Payment from "./pages/Payment/Payment";
 import Invoice from "./pages/Invoice/Invoice";
 import Setting from "./pages/Setting/Setting";
 
@@ -21,6 +21,9 @@ function App({loadMe,logInUserWithOauth,auth}) {
     useEffect(() => {
         loadMe()
     }, [loadMe]);
+	
+	
+	
 
     //redosled hookova
     useEffect(() => {
@@ -52,8 +55,8 @@ function App({loadMe,logInUserWithOauth,auth}) {
                         <Route path="/notfound" component={NotFound} />
 
                         <PrivateRoute path={`/booking`}  component={Reservation}  isAuthenticated={auth.isAuthenticated} />
-                        <PrivateRoute path={`/historic`}  component={List}  isAuthenticated={auth.isAuthenticated} />
-                        <PrivateRoute path={`/invoice`}  component={Invoice}  isAuthenticated={auth.isAuthenticated} />
+                        <PrivateRoute path={`/booking-list`}  component={Invoice}  isAuthenticated={auth.isAuthenticated} />
+                        <PrivateRoute path={`/payment-historic`}  component={Payment}  isAuthenticated={auth.isAuthenticated} />
                         <PrivateRoute path={`/settings`}  component={Setting}  isAuthenticated={auth.isAuthenticated} />
                         <Route component={NotFound} />
                     </Switch>

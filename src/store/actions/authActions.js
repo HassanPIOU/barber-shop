@@ -11,7 +11,7 @@ import {
     LOGIN_WITH_EMAIL_FAIL,
     ME_LOADING,
     ME_SUCCESS,
-    ME_FAIL,
+    ME_FAIL, LOGOUT_LOADING, DELETE_SERVICE_SUCCESS, DELETE_SERVICE_FAIL, DELETE_SERVICE_LOADING, LOGOUT_FAIL,
 } from '../types';
 import {SERVER_URL} from "../../base/app";
 
@@ -91,25 +91,33 @@ export const logInUserWithOauth = (token) => async (dispatch, getState) => {
   }
 };
 
-// Log user out
-export const logOutUser = (history) => async (dispatch) => {
-  try {
-    //just to log user logut on the server
-    await axios.get(SERVER_URL+'logout');
 
+
+export const logOutUser = (history) => async (dispatch,getState) => {
     dispatch({
-      type: LOGOUT_SUCCESS,
+        type: LOGOUT_LOADING,
     });
+    try {
+        const options = attachTokenToHeaders(getState);
+        const response = await axios.get(SERVER_URL+"logout",options);
 
-        history.push('/');
+        console.log(response)
+        dispatch({
+            type: LOGOUT_SUCCESS,
+            payload: { message: response.data.message },
+        });
 
+        history.push("login")
 
-      deleteAllCookies();
+        deleteAllCookies()
 
-
-  } catch (err) {}
+    } catch (err) {
+        dispatch({
+            type: LOGOUT_FAIL,
+            payload: { error: err?.response?.data.message || err.message },
+        });
+    }
 };
-
 
 
 
@@ -132,12 +140,14 @@ export const attachTokenToHeaders = (getState) => {
   const config = {
     headers: {
       'Content-type': 'application/json',
+     'content-type': 'multipart/form-data'
     },
   };
 
   if (token) {
     config.headers['Authorization'] = "Bearer " +token;
   }
-
   return config;
 };
+
+
